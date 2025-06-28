@@ -92,6 +92,18 @@ def get_symlink_pairs(ref, *, det_map, root_map=None):
     if root_map is None:
         root_map = {}
 
+    class FailsafeDict(dict):
+        """ A dictionary that returns a string representation of the key
+        if the key is not found, instead of raising a KeyError.
+        This is useful for formatting strings with keys that may not exist
+        in the dictionary, allowing for a fallback representation.
+        """
+        def __getitem__(self, item):
+            try:
+                return super().__getitem__(item)
+            except KeyError:
+                return "{" + str(item) + "}"
+
     links = []
     target_template: str
     output_path: str
@@ -182,7 +194,7 @@ def get_symlink_pairs(ref, *, det_map, root_map=None):
                             N=point_number * fpp + fr,
                             det_type=det_type,
                             **single_doc_data
-                        ).format(**single_doc_data)
+                        ).format_map(FailsafeDict(single_doc_data))
                         
                         links.append(
                             (start_uid, source_path, dest_path, analysis_path)
