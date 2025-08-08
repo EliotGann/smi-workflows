@@ -1,35 +1,57 @@
-# Welcome to your prefect.yaml file! You can use this file for storing and managing
-# configuration for deploying your flows. We recommend committing this file to source
-# control along with your flow code.
+name: prefect-docker-pixi-tiled
+prefect-version: 3.6.0
 
-# Generic metadata about this project
-name: workflows
-prefect-version: 2.18.1
-
-# build section allows you to manage and build docker images
 build:
+  - prefect.deployments.steps.run_shell_script:
+      id: get-commit-hash
+      script: git rev-parse --short HEAD
+      stream_output: false
+  - prefect_docker.deployments.steps.build_docker_image:
+      id: build-image
+      requires: prefect-docker>0.6.0
+      image_name: ghcr.io/nsls2/tst-workflow-prefect3
+      tag: "{{ get-commit-hash.stdout }}"
+      dockerfile: Dockerfile
+      additional_tags:
+        - main
 
-# push section allows you to manage if and how this project is uploaded to remote locations
 push:
+  - prefect_docker.deployments.steps.push_docker_image:
+      requires: prefect-docker>0.6.0
+      image_name: "{{ build-image.image_name }}"
+      tag: "{{ build-image.tag }}"
+      credentials:
+        "{{
+        prefect.blocks.docker-registry-credentials.ghcr-nsls2-tst-workflow-prefect3
+        }}"
+      additional_tags:
+        - main
 
-# pull section allows you to provide instructions for cloning this project in remote locations
 pull:
-- prefect.deployments.steps.git_clone:
-    repository: https://github.com/NSLS-II-SMI/workflows
-    branch: main
+  - prefect.deployments.steps.git_clone:
+      repository: https://github.com/nsls2/tst-workflow-prefect3.git
+      branch: add-tst-workflows
+      access_token:
+        "{{
+        prefect.blocks.secret.deployment-tstworkflowprefect3-end-of-run-workflow-repo-token
+        }}"
 
-# the deployments section allows you to provide configuration for deploying flows
 deployments:
-- name: smi-end-of-run-workflow
-  version:
-  tags:
-  - smi
-  description:
-  entrypoint: end_of_run_workflow.py:end_of_run_workflow
-  parameters: {}
-  work_pool:
-    name: smi-work-pool
-    work_queue_name:
-    job_variables: {}
-  schedule:
-  is_schedule_active: true
+  - name: tst-end-of-run-workflow-docker
+    version: null
+    description: Deploy the updated Docker image
+    entrypoint: end_of_run_workflow.py:end_of_run_workflow
+    parameters: {}
+    schedule: {}
+    work_pool:
+      job_variables:
+        env:
+          TILED_SITE_PROFILES: /nsls2/software/etc/tiled/profiles
+          TILED_API_KEY: "{{ prefect.blocks.secret.tiled-tst-api-key }}"
+        image: ghcr.io/nsls2/tst-workflow-prefect3:main
+        network_mode: host
+        userns: "keep-id:uid=402974,gid=402974"  # workflow-tst:workflow-tst
+        volumes:
+          - /nsls2/data/tst/proposals:/nsls2/data/tst/proposals
+          - /nsls2/software/etc/tiled:/nsls2/software/etc/tiled
+      name: tst-work-pool-docker
