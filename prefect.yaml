@@ -30,7 +30,7 @@ push:
 pull:
   - prefect.deployments.steps.git_clone:
       repository: https://github.com/nsls-ii-smi/workflows.git
-      branch: main
+      branch: prefect3-pixi-upgrade
 
 deployments:
   - name: smi-end-of-run-workflow-docker
