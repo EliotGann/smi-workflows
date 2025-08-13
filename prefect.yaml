@@ -29,7 +29,7 @@ push:
 
 pull:
   - prefect.deployments.steps.git_clone:
-      repository: https://github.com/nsls-ii-smi/workflows.git
+      repository: https://github.com/JunAishima/smi-workflows.git
       branch: prefect3-pixi-upgrade
 
 deployments:
