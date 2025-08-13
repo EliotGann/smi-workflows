@@ -8,7 +8,7 @@ def read_all_streams(uid, beamline_acronym):
     logger = get_run_logger()
     tiled_client = from_profile("nsls2")
     run = tiled_client[beamline_acronym]["raw"][uid]
-    logger.info(f"Validating uid {run.start['uid']}")
+    logger.info(f"Validating uid {uid}")
     start_time = ttime.monotonic()
     for stream in run:
         logger.info(f"{stream}:")
