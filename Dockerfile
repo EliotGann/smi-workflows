@@ -18,7 +18,7 @@ ENV PYTHONUNBUFFERED=1
 
 COPY test.py .
 
-#ENV TILED_API_KEY=""
+ENV TILED_API_KEY=""
 RUN mkdir /etc/tiled
 RUN /bin/bash /shell-hook
 
