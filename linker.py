@@ -31,6 +31,7 @@ def do_symlinking(
         The linked (or failed) values.
     """
 
+    logger = get_run_logger()
     failed = []
     linked = []
 
@@ -58,6 +59,7 @@ def do_symlinking(
             if overwrite_dest and dest.exists():
                 dest.unlink()
             dest.symlink_to(src)
+            logger.info(f"symlink: {src} to {dest}")
 
         except Exception:
             tqdm.tqdm.write(f"FAILED: {dest}")
