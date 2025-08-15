@@ -67,6 +67,11 @@ def do_symlinking(
         else:
             tqdm.tqdm.write(f"Linked: {dest}")
             linked.append((uid, src, dest, analysis))
+    if failed:
+        logger.error(f"Tasks failed: {failed}")
+    logger.info("Linked items:")
+    for item in linked:
+        logger.info(item)
     return linked, failed
 
 
