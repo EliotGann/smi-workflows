@@ -102,7 +102,7 @@ def get_symlink_pairs(ref, *, det_map, root_map=None):
 
     # hrf = db[ref]
     hrf = tiled_client_raw[ref]
-    for name, doc in hrf.documents():
+    for name, doc in hrf.metadata.items():
         if name == "start":
             start_uid = doc["uid"]
             #target_template = (f"{{det_name}}/{doc['username']}_{doc['sample_name']}_"
