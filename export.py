@@ -51,7 +51,7 @@ def export_amptek(ref):
         print(f"Start exporting of spectra to {newdirpath}")
 
 
-        for name, doc in run.metadata.items():
+        for name, doc in run.documents():
             if "event" in name:
                 # continue building the target_template here adding
                 # the event level things (motor positions)
