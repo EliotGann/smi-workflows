@@ -30,7 +30,7 @@ def export_amptek(ref):
     run = tiled_client_raw[ref]
 
 
-    if "amptek_energy_channels" in run["primary"]["data"] and "amptek_mca_spectrum" in run["primary"]["data"]:
+    if "amptek_energy_channels" in run.primary.data and "amptek_mca_spectrum" in run.primary.data :
         cycle = run.metadata["start"]["cycle"]
         project = run.metadata["start"]["project_name"]
         datasession = run.metadata["start"]["data_session"]
@@ -42,7 +42,7 @@ def export_amptek(ref):
         target_template = (f"{sample_name}_id{scan_id}_FY.csv")
         common_column="amptek_energy_channels"
         columns=["amptek_mca_spectrum"]
-        xr = run["primary"]["data"].read()
+        xr = run.primary.read()
         if columns is None:
             columns = list(xr.keys())
         all_columns = [common_column] + columns
