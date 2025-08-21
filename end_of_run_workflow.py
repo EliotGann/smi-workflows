@@ -1,3 +1,4 @@
+import getpass
 from prefect import task, flow, get_run_logger
 from prefect.task_runners import ConcurrentTaskRunner
 from data_validation import read_all_streams
@@ -15,6 +16,7 @@ def log_completion():
 def end_of_run_workflow(stop_doc):
     logger = get_run_logger()
     uid = stop_doc["run_start"]
+    logger.info(f"effective user: {getpass.getuser()}")
 
     # Launch validation and linker concurrently.
     det_map = {"900KW": "WAXS", "1M": "SAXS", "2M": "SAXS2M"}
