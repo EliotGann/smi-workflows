@@ -37,6 +37,7 @@ def do_symlinking(
     linked = []
 
     for uid, src, dest, analysis in tqdm.tqdm(links, leave=False):
+        logger.info(f"uid: {uid} src: {src} dest: {dest} analysis: {analysis}")
         if not src.exists():
             logger.error(f"{src} does not exist. uid: {uid} dest: {dest} analysis: {analysis}")
             failed.append((uid, src, dest, analysis))
