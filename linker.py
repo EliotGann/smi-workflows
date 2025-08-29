@@ -10,6 +10,7 @@ tiled_client = from_profile("nsls2")["smi"]
 tiled_client_raw = tiled_client["raw"]
 
 
+@task
 def do_symlinking(
     links: list[tuple[str, Path, Path]],
     overwrite_dest=False,
