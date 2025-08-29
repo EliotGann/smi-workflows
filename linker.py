@@ -62,8 +62,9 @@ def do_symlinking(
             dest.symlink_to(src)
             logger.info(f"symlink: {src} to {dest}")
 
-        except Exception:
+        except Exception as e:
             tqdm.tqdm.write(f"FAILED: {dest}")
+            logger.error("Exception while making symlink: {src} to {dest}")
             failed.append((uid, src, dest, analysis))
         else:
             tqdm.tqdm.write(f"Linked: {dest}")
