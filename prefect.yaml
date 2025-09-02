@@ -50,6 +50,7 @@ deployments:
         network: slirp4netns
         volumes:
           - /nsls2/data/smi/proposals:/nsls2/data/smi/proposals
+          - /nsls2/data/smi/shared/default_nb:/nsls2/data/smi/shared/default_nb
           - /nsls2/software/etc/tiled:/nsls2/software/etc/tiled
         container_create_kwargs:
           userns_mode: "keep-id:uid=402959,gid=402959"  # workflow-smi:workflow-smi
