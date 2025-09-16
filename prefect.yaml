@@ -1,31 +1,9 @@
 name: prefect-docker-pixi-tiled-smi
 prefect-version: 3.6.0
 
-build:
-  - prefect.deployments.steps.run_shell_script:
-      id: get-commit-hash
-      script: git rev-parse --short HEAD
-      stream_output: false
-  - prefect_docker.deployments.steps.build_docker_image:
-      id: build-image
-      requires: prefect-docker>0.6.0
-      image_name: ghcr.io/nsls2/smi-workflow-prefect3
-      tag: "{{ get-commit-hash.stdout }}"
-      dockerfile: Dockerfile
-      additional_tags:
-        - main
+build: null
 
-push:
-  - prefect_docker.deployments.steps.push_docker_image:
-      requires: prefect-docker>0.6.0
-      image_name: "{{ build-image.image_name }}"
-      tag: "{{ build-image.tag }}"
-      credentials:
-        "{{
-        prefect.blocks.docker-registry-credentials.ghcr-nsls2-smi-workflow-prefect3
-        }}"
-      additional_tags:
-        - main
+push: null
 
 pull:
   - prefect.deployments.steps.set_working_directory:
