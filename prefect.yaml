@@ -9,8 +9,8 @@ pull:
   - prefect.deployments.steps.set_working_directory:
       directory: /repo
   - prefect.deployments.steps.git_clone:
-      repository: https://github.com/NSLS-II-SMI/workflows.git
-      branch: prefect3-pixi-upgrade
+      repository: https://github.com/nsls2/smi-workflows.git
+      branch: main
 
 deployments:
   - name: smi-end-of-run-workflow-docker
@@ -24,7 +24,7 @@ deployments:
         env:
           TILED_SITE_PROFILES: /nsls2/software/etc/tiled/profiles
           TILED_API_KEY: "{{ prefect.blocks.secret.tiled-smi-api-key }}"
-        image: ghcr.io/nsls2/smi-workflow-prefect3:main
+        image: ghcr.io/nsls2/smi-workflows:main
         network: slirp4netns
         volumes:
           - /nsls2/data/smi/proposals:/nsls2/data/smi/proposals
