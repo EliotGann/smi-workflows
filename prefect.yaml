@@ -37,6 +37,9 @@ pull:
 deployments:
   - name: smi-end-of-run-workflow-docker
     version: 0.1.1
+    tags:
+      - smi
+      - main
     description: Deploy the updated Docker image
     entrypoint: end_of_run_workflow.py:end_of_run_workflow
     parameters: {}
