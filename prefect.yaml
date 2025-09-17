@@ -32,4 +32,5 @@ deployments:
           - /nsls2/software/etc/tiled:/nsls2/software/etc/tiled
         container_create_kwargs:
           userns_mode: "keep-id:uid=402959,gid=402959"  # workflow-smi:workflow-smi
+        auto_remove: true
       name: smi-work-pool-docker
