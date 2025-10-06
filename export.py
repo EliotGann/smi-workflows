@@ -3,10 +3,10 @@ import os, event_model
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from tiled.client import from_profile
 import time as ttime
+from utils import get_tiled_client
 
-tiled_client = from_profile("nsls2")["smi"]
+tiled_client = get_tiled_client()
 tiled_client_raw = tiled_client["raw"]
 
 @task
