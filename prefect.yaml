@@ -27,6 +27,7 @@ deployments:
         env:
           TILED_SITE_PROFILES: /nsls2/software/etc/tiled/profiles
         image: ghcr.io/nsls2/smi-workflows:prefect3-pixi-upgrade
+        image_pull_policy: Always
         network: slirp4netns
         volumes:
           - /nsls2/data/smi/proposals:/nsls2/data/smi/proposals
