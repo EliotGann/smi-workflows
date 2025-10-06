@@ -1,38 +1,16 @@
 name: prefect-docker-pixi-tiled-smi
 prefect-version: 3.6.0
 
-build:
-  - prefect.deployments.steps.run_shell_script:
-      id: get-commit-hash
-      script: git rev-parse --short HEAD
-      stream_output: false
-  - prefect_docker.deployments.steps.build_docker_image:
-      id: build-image
-      requires: prefect-docker>0.6.0
-      image_name: ghcr.io/nsls2/smi-workflow-prefect3
-      tag: "{{ get-commit-hash.stdout }}"
-      dockerfile: Dockerfile
-      additional_tags:
-        - main
+build: null
 
-push:
-  - prefect_docker.deployments.steps.push_docker_image:
-      requires: prefect-docker>0.6.0
-      image_name: "{{ build-image.image_name }}"
-      tag: "{{ build-image.tag }}"
-      credentials:
-        "{{
-        prefect.blocks.docker-registry-credentials.ghcr-nsls2-smi-workflow-prefect3
-        }}"
-      additional_tags:
-        - main
+push: null
 
 pull:
   - prefect.deployments.steps.set_working_directory:
       directory: /repo
   - prefect.deployments.steps.git_clone:
-      repository: https://github.com/JunAishima/smi-workflows.git
-      branch: prefect3-pixi-upgrade
+      repository: https://github.com/nsls2/smi-workflows.git
+      branch: main
 
 deployments:
   - name: smi-end-of-run-workflow-docker
@@ -48,8 +26,7 @@ deployments:
       job_variables:
         env:
           TILED_SITE_PROFILES: /nsls2/software/etc/tiled/profiles
-          TILED_API_KEY: "{{ prefect.blocks.secret.tiled-smi-api-key }}"
-        image: ghcr.io/nsls2/smi-workflow-prefect3:main
+        image: ghcr.io/nsls2/smi-workflows:main
         network: slirp4netns
         volumes:
           - /nsls2/data/smi/proposals:/nsls2/data/smi/proposals
@@ -57,4 +34,5 @@ deployments:
           - /nsls2/software/etc/tiled:/nsls2/software/etc/tiled
         container_create_kwargs:
           userns_mode: "keep-id:uid=402959,gid=402959"  # workflow-smi:workflow-smi
+        auto_remove: true
       name: smi-work-pool-docker
