@@ -1,12 +1,12 @@
 from prefect import flow, task, get_run_logger
 from pathlib import Path
-from utils import get_tiled_client
+from tiled.client import from_profile
 
 import event_model
 import tqdm
 import shutil
 
-tiled_client = get_tiled_client()
+tiled_client = from_profile("nsls2")["smi"]
 tiled_client_raw = tiled_client["raw"]
 
 
