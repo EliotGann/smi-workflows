@@ -4,9 +4,11 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from tiled.client import from_profile
+from prefect.blocks.system import Secret
 import time as ttime
 
-tiled_client = from_profile("nsls2")["smi"]
+api_key = Secret.load("tiled-smi-api-key").get()
+tiled_client = from_profile("nsls2", api_key=api_key)["smi"]
 tiled_client_raw = tiled_client["raw"]
 
 @task
