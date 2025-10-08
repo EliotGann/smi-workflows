@@ -7,7 +7,7 @@ import event_model
 import tqdm
 import shutil
 
-api_key = Secret.load("tiled-smi-api-key").get()
+api_key = Secret.load("tiled-smi-api-key", _sync=True).get()
 tiled_client = from_profile("nsls2", api_key=api_key)["smi"]
 tiled_client_raw = tiled_client["raw"]
 
