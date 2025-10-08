@@ -1,15 +1,18 @@
 from prefect import flow, task, get_run_logger
 from pathlib import Path
 from tiled.client import from_profile
+from prefect.blocks.system import Secret
 
 import event_model
 import tqdm
 import shutil
 
-tiled_client = from_profile("nsls2")["smi"]
+api_key = Secret.load("tiled-smi-api-key", _sync=True).get()
+tiled_client = from_profile("nsls2", api_key=api_key)["smi"]
 tiled_client_raw = tiled_client["raw"]
 
 
+@task
 def do_symlinking(
     links: list[tuple[str, Path, Path]],
     overwrite_dest=False,
@@ -31,11 +34,14 @@ def do_symlinking(
         The linked (or failed) values.
     """
 
+    logger = get_run_logger()
     failed = []
     linked = []
 
     for uid, src, dest, analysis in tqdm.tqdm(links, leave=False):
+        logger.info(f"uid: {uid} src: {src} dest: {dest} analysis: {analysis}")
         if not src.exists():
+            logger.error(f"{src} does not exist. uid: {uid} dest: {dest} analysis: {analysis}")
             failed.append((uid, src, dest, analysis))
             continue
 
@@ -58,13 +64,20 @@ def do_symlinking(
             if overwrite_dest and dest.exists():
                 dest.unlink()
             dest.symlink_to(src)
+            logger.info(f"symlink: {src} to {dest}")
 
-        except Exception:
+        except Exception as e:
             tqdm.tqdm.write(f"FAILED: {dest}")
+            logger.exception(f"Exception while making symlink: {src} to {dest}")
             failed.append((uid, src, dest, analysis))
         else:
             tqdm.tqdm.write(f"Linked: {dest}")
             linked.append((uid, src, dest, analysis))
+    if failed:
+        logger.error(f"Tasks failed: {failed}")
+    logger.info("Linked items:")
+    for item in linked:
+        logger.info(item)
     return linked, failed
 
 

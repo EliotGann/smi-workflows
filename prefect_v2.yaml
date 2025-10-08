@@ -1,0 +1,24 @@
+name: prefect-tiled-smi
+prefect-version: 3.6.0
+
+build: null
+
+push: null
+
+pull:
+  - prefect.deployments.steps.git_clone:
+      repository: https://github.com/nsls2/smi-workflows.git
+      branch: main
+
+deployments:
+  - name: smi-end-of-run-workflow
+    version: 0.1.0
+    tags:
+      - smi
+      - main
+    description: Deploy image to run via process
+    entrypoint: end_of_run_workflow.py:end_of_run_workflow
+    parameters: {}
+    schedule: {}
+    work_pool:
+      name: smi-work-pool

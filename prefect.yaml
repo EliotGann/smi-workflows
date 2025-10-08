@@ -1,35 +1,39 @@
-# Welcome to your prefect.yaml file! You can use this file for storing and managing
-# configuration for deploying your flows. We recommend committing this file to source
-# control along with your flow code.
+name: prefect-docker-pixi-tiled-smi
+prefect-version: 3.6.0
 
-# Generic metadata about this project
-name: workflows
-prefect-version: 2.18.1
+build: null
 
-# build section allows you to manage and build docker images
-build:
+push: null
 
-# push section allows you to manage if and how this project is uploaded to remote locations
-push:
-
-# pull section allows you to provide instructions for cloning this project in remote locations
 pull:
-- prefect.deployments.steps.git_clone:
-    repository: https://github.com/NSLS-II-SMI/workflows
-    branch: main
+  - prefect.deployments.steps.set_working_directory:
+      directory: /repo
+  - prefect.deployments.steps.git_clone:
+      repository: https://github.com/nsls2/smi-workflows.git
+      branch: main
 
-# the deployments section allows you to provide configuration for deploying flows
 deployments:
-- name: smi-end-of-run-workflow
-  version:
-  tags:
-  - smi
-  description:
-  entrypoint: end_of_run_workflow.py:end_of_run_workflow
-  parameters: {}
-  work_pool:
-    name: smi-work-pool
-    work_queue_name:
-    job_variables: {}
-  schedule:
-  is_schedule_active: true
+  - name: smi-end-of-run-workflow-docker
+    version: 0.1.1
+    tags:
+      - smi
+      - main
+    description: Deploy the updated Docker image
+    entrypoint: end_of_run_workflow.py:end_of_run_workflow
+    parameters: {}
+    schedule: {}
+    work_pool:
+      job_variables:
+        env:
+          TILED_SITE_PROFILES: /nsls2/software/etc/tiled/profiles
+        image: ghcr.io/nsls2/smi-workflows:main
+        image_pull_policy: Always
+        network: slirp4netns
+        volumes:
+          - /nsls2/data/smi/proposals:/nsls2/data/smi/proposals
+          - /nsls2/data/smi/shared/default_nb:/nsls2/data/smi/shared/default_nb
+          - /nsls2/software/etc/tiled:/nsls2/software/etc/tiled
+        container_create_kwargs:
+          userns_mode: "keep-id:uid=402959,gid=402959"  # workflow-smi:workflow-smi
+        auto_remove: true
+      name: smi-work-pool-docker
