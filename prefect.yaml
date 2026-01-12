@@ -1,5 +1,5 @@
 name: prefect-docker-pixi-tiled-smi
-prefect-version: 3.6.0
+prefect-version: 3.4.6
 
 build: null
 
@@ -14,7 +14,7 @@ pull:
 
 deployments:
   - name: smi-end-of-run-workflow-docker
-    version: 0.1.1
+    version: 0.1.2
     tags:
       - smi
       - main
