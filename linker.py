@@ -1,6 +1,6 @@
 from prefect import flow, task, get_run_logger
 from pathlib import Path
-from tiled.client import from_profile
+from tiled.client import from_uri
 from prefect.blocks.system import Secret
 
 import event_model
