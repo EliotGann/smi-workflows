@@ -7,9 +7,10 @@ import event_model
 import tqdm
 import shutil
 
-api_key = Secret.load("tiled-smi-api-key", _sync=True).get()
-tiled_client = from_profile("nsls2", api_key=api_key)["smi"]
-tiled_client_raw = tiled_client["raw"]
+
+@task
+def get_run(uid, api_key=api_key):
+    return from_uri("https://tiled.nsls2.bnl.gov", api_key=api_key)["smi"]["raw"][uid]
 
 
 @task
@@ -82,7 +83,7 @@ def do_symlinking(
 
 
 @task
-def get_symlink_pairs(ref, *, det_map, root_map=None):
+def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None):
     """
     Parameters
     ----------
@@ -114,7 +115,7 @@ def get_symlink_pairs(ref, *, det_map, root_map=None):
     ########################
 
     # hrf = db[ref]
-    hrf = tiled_client_raw[ref]
+    hrf = get_run(ref, api_key=api_key)
     for name, doc in hrf.documents():
         if name == "start":
             start_uid = doc["uid"]
