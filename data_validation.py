@@ -20,7 +20,9 @@ def read_stream(run, stream):
 
 @flow
 def data_validation(uid, api_key=None):
+    logger = get_run_logger()
     start_time = ttime.monotonic()
+    run = get_client(uid, api_key=api_key)
     for stream in run:
         logger.info(f"{stream}:")
         stream_start_time = ttime.monotonic()
