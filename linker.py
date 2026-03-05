@@ -83,7 +83,7 @@ def do_symlinking(
 
 
 @task
-def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None):
+def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None, dry_run=False):
     """
     Parameters
     ----------
@@ -205,7 +205,11 @@ def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None):
         elif name == "stop":
             break
 
-    linked, failed = do_symlinking(links, overwrite_dest=True)
+    if not dry_run:
+        linked, failed = do_symlinking(links, overwrite_dest=True)
+    else:
+        logger.info("Dry run: not generating links")
+        return
 
     if len(failed) > 0:
         logger.info(f"Failed generating links {failed}")
