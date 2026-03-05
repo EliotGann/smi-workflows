@@ -4,7 +4,7 @@ from prefect import task, flow, get_run_logger
 from prefect.task_runners import ConcurrentTaskRunner
 from data_validation import data_validation
 from linker import get_symlink_pairs
-from export import export_amptek
+from export import export_amptek, has_amptek_keys
 from dotenv import load_dotenv
 
 
@@ -41,10 +41,13 @@ def end_of_run_workflow(stop_doc, dry_run=False):
     validation_task = data_validation.submit(uid, api_key=api_key, dry_run=dry_run)
     logger.info("Launched validation task")
     export_task = None
-    if not dry_run:
+    if not dry_run and has_amptek_keys(uid, api_key=api_key):
         export_task = export_amptek.submit(uid)
         logger.info("Launched amptek export task")
-
+    elif dry_run:
+        logger.info("Dry run: skipping amptek export")
+    else:
+        logger.info("Skipping export, amptek keys not present")
     # Wait for completion.
     logger.info("Waiting for tasks to complete")
     validation_task.result()

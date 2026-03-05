@@ -13,6 +13,12 @@ def get_run(uid, api_key=None):
 
 
 @task
+def has_amptek_keys(uid, api_key=None):
+    run = get_run(uid, api_key=api_key)
+    return ("amptek_energy_channels", "amptek_mca_spectrum") in run.primary.data
+
+
+@task
 def export_amptek(ref, api_key=None):
     """
     Parameters
@@ -32,7 +38,7 @@ def export_amptek(ref, api_key=None):
 
     run = get_run(ref, api_key=api_key)
 
-    if "amptek_energy_channels" in run.primary.data and "amptek_mca_spectrum" in run.primary.data :
+    if has_amptek_keys(ref, api_key=api_key):
         cycle = run.metadata["start"]["cycle"]
         project = run.metadata["start"]["project_name"]
         datasession = run.metadata["start"]["data_session"]
