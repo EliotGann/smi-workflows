@@ -18,6 +18,7 @@ def read_stream(run, stream):
     return stream_data
 
 
+# this is a task to enable being run by a ConcurrentTaskRunner
 @task
 def read_all_streams(uid, api_key=None, dry_run=False):
     logger = get_run_logger()
