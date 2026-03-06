@@ -2,7 +2,7 @@ import getpass
 import os
 from prefect import task, flow, get_run_logger
 from prefect.task_runners import ConcurrentTaskRunner
-from data_validation import data_validation
+from data_validation import read_all_streams
 from linker import get_symlink_pairs
 from export import export_amptek, has_amptek_keys
 from dotenv import load_dotenv
@@ -39,7 +39,7 @@ def end_of_run_workflow(stop_doc, api_key=None, dry_run=False):
     det_map = {"900KW": "WAXS", "1M": "SAXS", "2M": "SAXS2M"}
     linker_task = get_symlink_pairs.submit(uid, det_map=det_map, api_key=api_key, dry_run=dry_run)
     logger.info("Launched linker task")
-    validation_task = data_validation.submit(uid, api_key=api_key, dry_run=dry_run)
+    validation_task = read_all_streams.submit(uid, api_key=api_key, dry_run=dry_run)
     logger.info("Launched validation task")
     export_task = None
     if not dry_run and has_amptek_keys(uid, api_key=api_key):

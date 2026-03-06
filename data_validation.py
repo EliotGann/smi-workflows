@@ -18,8 +18,8 @@ def read_stream(run, stream):
     return stream_data
 
 
-@flow
-def data_validation(uid, api_key=None, dry_run=False):
+@task
+def read_all_streams(uid, api_key=None, dry_run=False):
     logger = get_run_logger()
     if dry_run:
         logger.info("Dry run: not creating Tiled client or checking streams")
@@ -35,3 +35,7 @@ def data_validation(uid, api_key=None, dry_run=False):
             logger.info(f"{stream} nbytes = {stream_data.nbytes:_}")
         elapsed_time = ttime.monotonic() - start_time
         logger.info(f"{elapsed_time = }")
+
+@flow
+def data_validation(uid, api_key=None, dry_run=False):
+    read_all_streams(uid, api_key=api_key, dry_run=dry_run)
