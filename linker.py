@@ -190,14 +190,14 @@ def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None, dry_run=Fals
                             )
                         )
 
-                        
+
                         dest_path = target_path / target_template.format(
                             det_name=det_name,
                             N=point_number * fpp + fr,
                             det_type=det_type,
                             **single_doc_data
                         ).format(**single_doc_data)
-                        
+
                         links.append(
                             (start_uid, source_path, dest_path, analysis_path)
                         )
