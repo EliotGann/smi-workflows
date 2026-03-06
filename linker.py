@@ -10,7 +10,7 @@ import shutil
 
 
 @task
-def get_run(uid, api_key=api_key):
+def get_run(uid, api_key=None):
     return from_uri("https://tiled.nsls2.bnl.gov", api_key=api_key)["smi"]["raw"][uid]
 
 
