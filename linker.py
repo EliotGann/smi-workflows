@@ -2,6 +2,7 @@ from prefect import flow, task, get_run_logger
 from pathlib import Path
 from tiled.client import from_uri
 from prefect.blocks.system import Secret
+from prefect.states import Failed
 
 import event_model
 import tqdm
