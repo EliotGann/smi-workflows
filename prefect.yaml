@@ -30,7 +30,7 @@ deployments:
         volumes:
           - /nsls2/data/smi/proposals:/nsls2/data/smi/proposals
           - /nsls2/data/smi/shared/default_nb:/nsls2/data/smi/shared/default_nb
-          - /srv/prefect3_docker_worker_smi/app:/srv
+          - /srv/prefect3-docker-worker-smi/app:/srv
         container_create_kwargs:
           userns_mode: "keep-id:uid=402959,gid=402959"  # workflow-smi:workflow-smi
         auto_remove: true
