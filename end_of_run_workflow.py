@@ -28,10 +28,11 @@ def log_completion():
 
 
 @flow(task_runner=ConcurrentTaskRunner())
-def end_of_run_workflow(stop_doc, dry_run=False):
+def end_of_run_workflow(stop_doc, api_key=None, dry_run=False):
     logger = get_run_logger()
     uid = stop_doc["run_start"]
-    api_key = get_api_key_from_env(api_key=None)
+    if not api_key:
+        api_key = get_api_key_from_env(api_key=None)
     logger.info(f"effective user: {getpass.getuser()}")
 
     # Launch validation and linker concurrently.
