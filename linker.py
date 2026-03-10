@@ -205,7 +205,9 @@ def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None, dry_run=Fals
     if not dry_run:
         linked, failed = do_symlinking(links, overwrite_dest=True)
     else:
-        logger.info("Dry run: not generating links")
+        logger.info("Dry run: skipped link information: ")
+        for link in links:
+            logger.info(f"UID: {link[0]} src: {link[1]} dest: {link[2]} analysis: {link[3]}")
         return
 
     if len(failed) > 0:
