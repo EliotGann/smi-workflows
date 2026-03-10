@@ -3,13 +3,8 @@ import os, event_model
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from tiled.client import from_uri
 import time as ttime
-
-
-@task
-def get_run(uid, api_key=None):
-    return from_uri("https://tiled.nsls2.bnl.gov", api_key=api_key)["smi"]["raw"][uid]
+from data_validation import get_run
 
 
 @task

@@ -3,15 +3,11 @@ from pathlib import Path
 from tiled.client import from_uri
 from prefect.blocks.system import Secret
 from prefect.states import Failed
+from data_validation import get_run
 
 import event_model
 import tqdm
 import shutil
-
-
-@task
-def get_run(uid, api_key=None):
-    return from_uri("https://tiled.nsls2.bnl.gov", api_key=api_key)["smi"]["raw"][uid]
 
 
 @task
