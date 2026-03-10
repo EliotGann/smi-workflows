@@ -34,7 +34,7 @@ def end_of_run_workflow(stop_doc, api_key=None, dry_run=False):
     det_map = {"900KW": "WAXS", "1M": "SAXS", "2M": "SAXS2M"}
     linker_task = get_symlink_pairs.submit(uid, det_map=det_map, api_key=api_key, dry_run=dry_run)
     logger.info("Launched linker task")
-    validation_task = read_all_streams.submit(uid, api_key=api_key, dry_run=dry_run)
+    validation_task = read_all_streams.submit(uid, api_key=api_key)
     logger.info("Launched validation task")
     export_task = None
     if not dry_run and has_amptek_keys(uid, api_key=api_key):
