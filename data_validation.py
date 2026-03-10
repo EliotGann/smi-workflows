@@ -5,10 +5,8 @@ from tiled.client import from_uri
 
 @task(retries=2, retry_delay_seconds=10)
 def get_run(uid, api_key=None):
-    logger = get_run_logger()
     tiled_client = from_uri("https://tiled.nsls2.bnl.gov", api_key=api_key)
     run = tiled_client["smi/raw"][uid]
-    logger.info(f"Validating uid {uid}")
     return run
 
 
@@ -27,6 +25,7 @@ def read_all_streams(uid, api_key=None, dry_run=False):
     else:
         start_time = ttime.monotonic()
         run = get_run(uid, api_key=api_key)
+        logger.info(f"Validating uid {uid}")
         for stream in run:
             logger.info(f"{stream}:")
             stream_start_time = ttime.monotonic()
