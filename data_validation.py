@@ -4,7 +4,7 @@ from tiled.client import from_uri
 
 
 @task(retries=2, retry_delay_seconds=10)
-def get_client(uid, api_key=None):
+def get_run(uid, api_key=None):
     logger = get_run_logger()
     tiled_client = from_uri("https://tiled.nsls2.bnl.gov", api_key=api_key)
     run = tiled_client["smi"]["raw"][uid]
