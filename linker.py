@@ -1,15 +1,13 @@
 from prefect import flow, task, get_run_logger
 from pathlib import Path
-from tiled.client import from_profile
+from tiled.client import from_uri
 from prefect.blocks.system import Secret
+from prefect.states import Failed
+from data_validation import get_run
 
 import event_model
 import tqdm
 import shutil
-
-api_key = Secret.load("tiled-smi-api-key", _sync=True).get()
-tiled_client = from_profile("nsls2", api_key=api_key)["smi"]
-tiled_client_raw = tiled_client["raw"]
 
 
 @task
@@ -82,7 +80,7 @@ def do_symlinking(
 
 
 @task
-def get_symlink_pairs(ref, *, det_map, root_map=None):
+def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None, dry_run=False):
     """
     Parameters
     ----------
@@ -114,7 +112,7 @@ def get_symlink_pairs(ref, *, det_map, root_map=None):
     ########################
 
     # hrf = db[ref]
-    hrf = tiled_client_raw[ref]
+    hrf = get_run(ref, api_key=api_key)
     for name, doc in hrf.documents():
         if name == "start":
             start_uid = doc["uid"]
@@ -189,14 +187,14 @@ def get_symlink_pairs(ref, *, det_map, root_map=None):
                             )
                         )
 
-                        
+
                         dest_path = target_path / target_template.format(
                             det_name=det_name,
                             N=point_number * fpp + fr,
                             det_type=det_type,
                             **single_doc_data
                         ).format(**single_doc_data)
-                        
+
                         links.append(
                             (start_uid, source_path, dest_path, analysis_path)
                         )
@@ -204,12 +202,21 @@ def get_symlink_pairs(ref, *, det_map, root_map=None):
         elif name == "stop":
             break
 
-    linked, failed = do_symlinking(links, overwrite_dest=True)
+    if not dry_run:
+        linked, failed = do_symlinking(links, overwrite_dest=True)
+    else:
+        logger.info("Dry run: skipped link information: ")
+        for link in links:
+            logger.info(f"UID: {link[0]} src: {link[1]} dest: {link[2]} analysis: {link[3]}")
+        return
 
     if len(failed) > 0:
         logger.info(f"Failed generating links {failed}")
-        return
+        success_rate = len(failed) / (len(failed) + len(linked)) * 100
+        logger.info("Success rate: {success_rate:.2f}%")
+        return Failed(message="{len(failed)} failures - {success_rate:.2f} success rate")
     elif len(linked) > 0:
         logger.info(f"Links successfully generated {linked}")
+        logger.info(f"Success rate: 100%")
         return
 

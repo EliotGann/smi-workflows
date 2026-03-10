@@ -14,7 +14,7 @@ pull:
 
 deployments:
   - name: smi-end-of-run-workflow-docker
-    version: 0.1.2
+    version: 0.1.3
     tags:
       - smi
       - main
@@ -24,15 +24,13 @@ deployments:
     schedule: {}
     work_pool:
       job_variables:
-        env:
-          TILED_SITE_PROFILES: /nsls2/software/etc/tiled/profiles
         image: ghcr.io/nsls2/smi-workflows:main
         image_pull_policy: Always
         network: slirp4netns
         volumes:
           - /nsls2/data/smi/proposals:/nsls2/data/smi/proposals
           - /nsls2/data/smi/shared/default_nb:/nsls2/data/smi/shared/default_nb
-          - /nsls2/software/etc/tiled:/nsls2/software/etc/tiled
+          - /srv/prefect3-docker-worker-smi/app:/srv
         container_create_kwargs:
           userns_mode: "keep-id:uid=402959,gid=402959"  # workflow-smi:workflow-smi
         auto_remove: true

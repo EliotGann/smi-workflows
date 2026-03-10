@@ -3,16 +3,18 @@ import os, event_model
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from tiled.client import from_profile
-from prefect.blocks.system import Secret
 import time as ttime
+from data_validation import get_run
 
-api_key = Secret.load("tiled-smi-api-key", _sync=True).get()
-tiled_client = from_profile("nsls2", api_key=api_key)["smi"]
-tiled_client_raw = tiled_client["raw"]
 
 @task
-def export_amptek(ref):
+def has_amptek_keys(uid, api_key=None):
+    run = get_run(uid, api_key=api_key)
+    return ("amptek_energy_channels", "amptek_mca_spectrum") in run.primary.data
+
+
+@task
+def export_amptek(ref, api_key=None):
     """
     Parameters
     ----------
@@ -29,10 +31,9 @@ def export_amptek(ref):
 
     ########################
 
-    run = tiled_client_raw[ref]
+    run = get_run(ref, api_key=api_key)
 
-
-    if "amptek_energy_channels" in run.primary.data and "amptek_mca_spectrum" in run.primary.data :
+    if has_amptek_keys(ref, api_key=api_key):
         cycle = run.metadata["start"]["cycle"]
         project = run.metadata["start"]["project_name"]
         datasession = run.metadata["start"]["data_session"]

@@ -1,9 +1,19 @@
 import getpass
+import os
 from prefect import task, flow, get_run_logger
 from prefect.task_runners import ConcurrentTaskRunner
 from data_validation import read_all_streams
 from linker import get_symlink_pairs
-from export import export_amptek
+from export import export_amptek, has_amptek_keys
+from dotenv import load_dotenv
+
+
+def get_api_key_from_env(api_key=None):
+    logger = get_run_logger()
+    with open("/srv/container.secret", "r") as secrets:
+        load_dotenv(stream=secrets)
+    api_key = os.environ["TILED_API_KEY"]
+    return api_key
 
 
 @task
@@ -13,23 +23,31 @@ def log_completion():
 
 
 @flow(task_runner=ConcurrentTaskRunner())
-def end_of_run_workflow(stop_doc):
+def end_of_run_workflow(stop_doc, api_key=None, dry_run=False):
     logger = get_run_logger()
     uid = stop_doc["run_start"]
+    if not api_key:
+        api_key = get_api_key_from_env(api_key=None)
     logger.info(f"effective user: {getpass.getuser()}")
 
     # Launch validation and linker concurrently.
     det_map = {"900KW": "WAXS", "1M": "SAXS", "2M": "SAXS2M"}
-    linker_task = get_symlink_pairs.submit(uid, det_map=det_map)
+    linker_task = get_symlink_pairs.submit(uid, det_map=det_map, api_key=api_key, dry_run=dry_run)
     logger.info("Launched linker task")
-    validation_task = read_all_streams.submit(uid, beamline_acronym="smi")
+    validation_task = read_all_streams.submit(uid, api_key=api_key)
     logger.info("Launched validation task")
-    export_task = export_amptek.submit(uid)
-    logger.info("Launched amptek export task")
-
+    export_task = None
+    if not dry_run and has_amptek_keys(uid, api_key=api_key):
+        export_task = export_amptek.submit(uid)
+        logger.info("Launched amptek export task")
+    elif dry_run:
+        logger.info("Dry run: skipping amptek export")
+    else:
+        logger.info("Skipping export, amptek keys not present")
     # Wait for completion.
     logger.info("Waiting for tasks to complete")
     validation_task.result()
     linker_task.result()
-    export_task.result()
+    if export_task:
+        export_task.result()
     log_completion()
