@@ -26,7 +26,7 @@ def read_all_streams(uid, api_key=None, dry_run=False):
         logger.info("Dry run: not creating Tiled client or checking streams")
     else:
         start_time = ttime.monotonic()
-        run = get_client(uid, api_key=api_key)
+        run = get_run(uid, api_key=api_key)
         for stream in run:
             logger.info(f"{stream}:")
             stream_start_time = ttime.monotonic()
