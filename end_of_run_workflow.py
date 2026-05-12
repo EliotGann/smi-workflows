@@ -18,7 +18,7 @@ CATALOG_NAME = "smi"
 
 def slack(func):
     """
-    Send a message to mon-prefect and mon-prefect-im slack channels if the flow-run failed.
+    Send a message to mon-prefect and mon-prefect-cs slack channels if the flow-run failed.
     Send a message to mon-prefect-smi slack channel with the flow-run status.
     Send a message to mon-bluesky slack channel if the bluesky-run failed.
 
