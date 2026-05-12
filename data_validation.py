@@ -1,10 +1,22 @@
+import os
 from prefect import task, flow, get_run_logger
 import time as ttime
 from tiled.client import from_uri
+from dotenv import load_dotenv
+
+
+def get_api_key_from_env(api_key=None):
+    logger = get_run_logger()
+    with open("/srv/container.secret", "r") as secrets:
+        load_dotenv(stream=secrets)
+    api_key = os.environ["TILED_API_KEY"]
+    return api_key
 
 
 @task(retries=2, retry_delay_seconds=10)
 def get_run(uid, api_key=None):
+    if not api_key:
+        api_key = get_api_key_from_env()
     tiled_client = from_uri("https://tiled.nsls2.bnl.gov", api_key=api_key)
     run = tiled_client["smi/raw"][uid]
     return run
