@@ -10,7 +10,7 @@ from data_validation import get_run
 @task
 def has_amptek_keys(uid, api_key=None):
     run = get_run(uid, api_key=api_key)
-    return ("amptek_energy_channels", "amptek_mca_spectrum") in run.primary.data
+    return all(k in run.primary.data for k in ("amptek_energy_channels", "amptek_mca_spectrum"))
 
 
 @task
