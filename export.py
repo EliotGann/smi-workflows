@@ -10,6 +10,13 @@ from data_validation import get_run
 @task
 def has_amptek_keys(uid, api_key=None):
     run = get_run(uid, api_key=api_key)
+    if "primary" not in run:
+        logger = get_run_logger()
+        logger.info(
+            f"No primary stream found for {uid} (scan may have been stopped or "
+            "aborted prematurely); skipping amptek export."
+        )
+        return False
     return all(k in run.primary.data for k in ("amptek_energy_channels", "amptek_mca_spectrum"))
 
 
