@@ -303,9 +303,9 @@ def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None, dry_run=Fals
 
     if len(failed) > 0:
         logger.info(f"Failed generating links {failed}")
-        success_rate = len(failed) / (len(failed) + len(linked)) * 100
-        logger.info("Success rate: {success_rate:.2f}%")
-        return Failed(message="{len(failed)} failures - {success_rate:.2f} success rate")
+        success_rate = len(linked) / (len(failed) + len(linked)) * 100
+        logger.info(f"Success rate: {success_rate:.2f}%")
+        return Failed(message=f"{len(failed)} failures - {success_rate:.2f}% success rate")
     elif len(linked) > 0:
         logger.info(f"Links successfully generated {linked}")
         logger.info(f"Success rate: 100%")
