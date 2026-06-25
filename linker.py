@@ -29,13 +29,22 @@ class _SafeFormatPlaceholder:
     out literally instead of raising ``KeyError``.
     """
 
-    def __init__(self, key):
+    def __init__(self, key: str):
         self.key = key
 
-    def __format__(self, spec):
+    def __format__(self, spec: str) -> str:
         if spec:
             return "{" + self.key + ":" + spec + "}"
         return "{" + self.key + "}"
+
+    def __str__(self) -> str:
+        return "{" + self.key + "}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __ascii__(self) -> str:
+        return self.__str__()
 
 
 class _SafeFormatDict(dict):
