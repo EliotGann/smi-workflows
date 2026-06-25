@@ -275,9 +275,12 @@ def get_symlink_pairs(ref, *, det_map, root_map=None, api_key=None, dry_run=Fals
                             "det_type": det_type,
                             **single_doc_data,
                         }
-                        dest_name = _safe_format(
-                            target_template, format_data, logger=logger
-                        )
+                        # Only the second pass warns: its input contains
+                        # every literal {key} the first pass left behind, so
+                        # its missing-key set is a superset of the first
+                        # pass's.  This avoids emitting duplicate warnings
+                        # for the same unresolved name.
+                        dest_name = _safe_format(target_template, format_data)
                         dest_name = _safe_format(
                             dest_name, format_data, logger=logger
                         )
